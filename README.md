@@ -266,17 +266,6 @@ YouTube URL / Local File
         └── Raw Transcript tab
 ```
 
----
-
-## 🤝 Contributing
-
-1. Fork the repository and create a feature branch.
-2. Run the test suite (`pytest tests/ -v`) — all tests must pass.
-3. Add or update tests for any new behaviour.
-4. Submit a pull request with a clear description of changes.
-
----
-
 ## 📄 License
 
 MIT License — see `LICENSE` for details.
