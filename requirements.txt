@@ -1,0 +1,16 @@
+# GUI Framework
+PyQt6>=6.7.0
+
+# Audio Download
+yt-dlp>=2024.11.4
+
+# Local Transcription
+faster-whisper>=1.0.3
+
+# AI Note Generation
+google-genai>=0.8.0
+
+# Testing
+pytest>=8.3.0
+pytest-qt>=4.4.0
+pytest-mock>=3.14.0
