@@ -23,6 +23,25 @@ from typing import Any
 
 from faster_whisper import WhisperModel  # type: ignore[import-untyped]
 
+# ---------------------------------------------------------------------------
+# Compatibility patch for PyAV >= 14 / 19
+# ---------------------------------------------------------------------------
+# In newer PyAV versions, av.open() removed/deprecated 'metadata_errors'.
+# faster-whisper 1.2.x still passes metadata_errors="ignore", which causes:
+# TypeError: open() got an unexpected keyword argument 'metadata_errors'.
+try:
+    import av
+
+    _orig_av_open = av.open
+
+    def _compat_av_open(*args: Any, **kwargs: Any) -> Any:
+        kwargs.pop("metadata_errors", None)
+        return _orig_av_open(*args, **kwargs)
+
+    av.open = _compat_av_open  # type: ignore[assignment]
+except Exception:  # noqa: BLE001
+    pass
+
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
