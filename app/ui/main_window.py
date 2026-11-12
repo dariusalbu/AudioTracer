@@ -19,6 +19,7 @@ from pathlib import Path
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QFont, QIcon, QTextCursor
 from PyQt6.QtWidgets import (
+    QComboBox,
     QFileDialog,
     QHBoxLayout,
     QLabel,
@@ -359,6 +360,12 @@ class MainWindow(QMainWindow):
         self.browse_btn.setToolTip("Open a local audio file")
         row.addWidget(self.browse_btn)
 
+        self.model_combo = QComboBox()
+        self.model_combo.setToolTip("Select Whisper model size (tiny is fastest, base is balanced)")
+        self.model_combo.addItems(["tiny (Ultra Fast)", "base (Balanced)", "small (High Accuracy)"])
+        self.model_combo.setCurrentIndex(0)  # default to tiny for high speed
+        row.addWidget(self.model_combo)
+
         self.start_btn = QPushButton("▶  Start Transcription")
         self.start_btn.setObjectName("start_btn")
         row.addWidget(self.start_btn)
@@ -452,6 +459,7 @@ class MainWindow(QMainWindow):
         """Restore the UI to its pre-job idle state."""
         self.start_btn.setEnabled(True)
         self.browse_btn.setEnabled(True)
+        self.model_combo.setEnabled(True)
         self.url_input.setEnabled(True)
         self.clear_btn.setEnabled(True)
         self.save_btn.setEnabled(self._last_result is not None)
@@ -463,6 +471,7 @@ class MainWindow(QMainWindow):
         """Lock interactive elements while a job is running."""
         self.start_btn.setEnabled(False)
         self.browse_btn.setEnabled(False)
+        self.model_combo.setEnabled(False)
         self.url_input.setEnabled(False)
         self.save_btn.setEnabled(False)
         self.clear_btn.setEnabled(False)
@@ -494,9 +503,12 @@ class MainWindow(QMainWindow):
         self._set_busy_state()
         self.status_label.setText("Initialising …")
 
+        chosen_label = self.model_combo.currentText().split()[0]
+        model_size = chosen_label if chosen_label in ("tiny", "base", "small") else self.WHISPER_MODEL
+
         self._worker = TranscriptionWorker(
             url_or_path=source,
-            model_size=self.WHISPER_MODEL,
+            model_size=model_size,
             device=self.WHISPER_DEVICE,
             compute_type=self.WHISPER_COMPUTE,
             backend=self.NOTE_BACKEND,

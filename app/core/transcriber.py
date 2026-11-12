@@ -137,19 +137,23 @@ class Transcriber:
         model_size: str = "base",
         device: str = "cpu",
         compute_type: str = "int8",
-        beam_size: int = 5,
+        beam_size: int = 1,
+        cpu_threads: int = 8,
     ) -> None:
         self._model_size = model_size
         self._device = device
         self._compute_type = compute_type
         self._beam_size = beam_size
+        self._cpu_threads = cpu_threads
         self._model: WhisperModel | None = None
 
         logger.info(
-            "Transcriber configured — model: %s | device: %s | compute_type: %s",
+            "Transcriber configured — model: %s | device: %s | compute_type: %s | beam_size: %d | cpu_threads: %d",
             model_size,
             device,
             compute_type,
+            beam_size,
+            cpu_threads,
         )
 
     # ------------------------------------------------------------------
@@ -166,13 +170,18 @@ class Transcriber:
         """
         if self._model is None:
             logger.info(
-                "Loading Whisper model '%s' on %s …", self._model_size, self._device
+                "Loading Whisper model '%s' on %s (threads=%d) …",
+                self._model_size,
+                self._device,
+                self._cpu_threads,
             )
             try:
                 self._model = WhisperModel(
                     self._model_size,
                     device=self._device,
                     compute_type=self._compute_type,
+                    cpu_threads=self._cpu_threads,
+                    num_workers=2,
                 )
                 logger.info("Whisper model loaded successfully.")
             except Exception as exc:
